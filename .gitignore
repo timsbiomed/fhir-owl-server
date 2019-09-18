@@ -1,0 +1,26 @@
+.idea
+*.iml
+target
+
+# IntelliJ
+out/
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+### Maven ###
+target/
+
+# End of https://www.gitignore.io/api/java,macos,maven,intellij
