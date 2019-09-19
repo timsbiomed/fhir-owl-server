@@ -1,4 +1,4 @@
-package hot.fhirowl.server;
+package hot.fhir.owl.server;
 
 import java.util.ArrayList;
 import java.util.List;

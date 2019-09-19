@@ -1,4 +1,4 @@
-package hot.fhirowl.server;
+package hot.fhir.owl.server;
 
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;

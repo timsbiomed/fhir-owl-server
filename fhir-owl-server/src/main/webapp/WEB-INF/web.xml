@@ -5,12 +5,12 @@
   This is the actual FHIR server
   -->
   <servlet>
-    <servlet-name>owlFhirServlet</servlet-name>
-    <servlet-class>hot.fhirowl.server.FhirOwlServlet</servlet-class>
+    <servlet-name>fhirOwlServlet</servlet-name>
+    <servlet-class>hot.fhir.owl.server.FhirOwlServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
-    <servlet-name>owlFhirServlet</servlet-name>
+    <servlet-name>fhirOwlServlet</servlet-name>
     <url-pattern>/fhirowl/*</url-pattern>
   </servlet-mapping>
 
