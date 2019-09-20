@@ -12,7 +12,7 @@ To run the server, use
 mvn clean jetty:run  
 ``` 
 
-Visit http://localhost:8080/fhirowl/metadata or http://localhost:8080/fhirowl/CodeSystem/1
+Visit http://localhost:8080/metadata or http://localhost:8080/CodeSystem/1
 
 To run integration test (Start the service and test the API), 
 
