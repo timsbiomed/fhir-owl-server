@@ -12,7 +12,7 @@ import ca.uhn.fhir.rest.server.interceptor.ResponseHighlighterInterceptor;
 
 import javax.servlet.annotation.WebServlet;
 
-@WebServlet(urlPatterns = {"/fhirowl/*"}, displayName = "FHIR OWL Server")
+@WebServlet(urlPatterns = {"/*"}, displayName = "FHIR OWL Server")
 public class FhirOwlServlet extends RestfulServer {
     private static final long serialVersionUID = 1L;
 
