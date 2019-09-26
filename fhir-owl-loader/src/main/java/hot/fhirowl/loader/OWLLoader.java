@@ -67,6 +67,9 @@ public class OWLLoader {
 //        OWLReasoner reasoner = factory.createReasoner(onto);
 //        OWLClass clazz = (OWLClass)onto.entitiesInSignature(IRI.create("http://purl.obolibrary.org/obo/STATO_0000033")).findFirst().get();
 //        reasoner.getSuperClasses(clazz, true).entities().forEach(System.out::println);
+//
+//        System.out.println(clazz.getIRI().getNamespace());
+//        System.out.println(clazz.getIRI().getScheme());
 
         Transformer transformer = new StatoTransformer();
         CodeSystem cs = transformer.transformToR4(onto);

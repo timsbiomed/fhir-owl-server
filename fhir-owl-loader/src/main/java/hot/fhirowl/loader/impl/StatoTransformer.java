@@ -13,7 +13,6 @@ import org.semanticweb.owlapi.vocab.DublinCoreVocabulary;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class StatoTransformer implements Transformer {
@@ -87,13 +86,20 @@ public class StatoTransformer implements Transformer {
             visited.add(clazz);
             CodeSystem.ConceptDefinitionComponent concept = codeSystem.addConcept();
 
-            concept.setCode(clazz.getIRI().getRemainder().get());
+            String code = clazz.getIRI().getRemainder().get();
+
+            concept.setCode(code);
             concept.setDisplay(labelFor(clazz, ontology));
 
-            concept.addProperty().setCode("imported").setValue(new BooleanType(false));
+            if (code.startsWith("STATO_")) {
+                concept.addProperty().setCode("imported").setValue(new BooleanType(false));
+            } else {
+                concept.addProperty().setCode("imported").setValue(new BooleanType(true));
+            }
+
             NodeSet<OWLClass> superClasses = reasoner.getSuperClasses(clazz, true);
             superClasses.entities().forEach(parent -> {
-                concept.addProperty().setCode("parent").setValue(new StringType(parent.getIRI().toString()));
+                concept.addProperty().setCode("parent").setValue(new StringType(parent.getIRI().getRemainder().get()));
             });
             // TODO: implement the next two lines for all cases
             concept.addProperty().setCode("root").setValue(new BooleanType(false));
