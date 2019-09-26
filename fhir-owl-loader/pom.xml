@@ -11,9 +11,7 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <groupId>hot.fhir.owl</groupId>
   <artifactId>fhir-owl-loader</artifactId>
-  <version>1.0-SNAPSHOT</version>
 
   <name>FHIR OWL Loader</name>
   <url>https://github.com/hot-fhir/fhir-owl</url>

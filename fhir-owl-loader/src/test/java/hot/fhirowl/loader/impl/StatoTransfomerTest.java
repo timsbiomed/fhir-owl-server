@@ -1,5 +1,7 @@
 package hot.fhirowl.loader.impl;
 
+import ca.uhn.fhir.context.FhirContext;
+import org.hl7.fhir.r4.model.CodeSystem;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -15,8 +17,17 @@ public class StatoTransfomerTest {
 
     @Test
     public void testOntology() {
+//        StatoTransformer transformer = new StatoTransformer();
+//        CodeSystem cs = transformer.transformToR4(ontoMock);
+//        FhirContext ctxR4 = FhirContext.forR4();
+//
+//        String encoded = ctxR4.newJsonParser().setPrettyPrint(true).encodeResourceToString(cs);
+//        System.out.println(encoded);
+    }
+
+    @Test
+    public void testCodeSystemFilter() {
         StatoTransformer transformer = new StatoTransformer();
-        transformer.transformToR4(ontoMock);
 
     }
 }
