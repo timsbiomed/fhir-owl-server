@@ -5,12 +5,10 @@ import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.CodeSystem;
 import org.hl7.fhir.r4.model.StringType;
 import org.semanticweb.HermiT.ReasonerFactory;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLLiteral;
-import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.vocab.DublinCoreVocabulary;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
@@ -80,14 +78,18 @@ public class StatoTransformer implements Transformer {
         ReasonerFactory factory = new ReasonerFactory();
         OWLReasoner reasoner = factory.createReasoner(ontology);
         Set<OWLClass> visited = new HashSet<>();
-        ontology.classesInSignature().forEach(clazz -> visitClass(reasoner, clazz, visited, codeSystem));
+        ontology.classesInSignature().forEach(clazz -> visitClass(reasoner, clazz, visited, ontology, codeSystem));
         return codeSystem;
     }
 
-    private CodeSystem visitClass(OWLReasoner reasoner, OWLClass clazz, Set<OWLClass> visited, CodeSystem codeSystem) {
+    private CodeSystem visitClass(OWLReasoner reasoner, OWLClass clazz, Set<OWLClass> visited, OWLOntology ontology, CodeSystem codeSystem) {
         if (!visited.contains(clazz) && reasoner.isSatisfiable(clazz)) {
             visited.add(clazz);
             CodeSystem.ConceptDefinitionComponent concept = codeSystem.addConcept();
+
+            concept.setCode(clazz.getIRI().getRemainder().get());
+            concept.setDisplay(labelFor(clazz, ontology));
+
             concept.addProperty().setCode("imported").setValue(new BooleanType(false));
             NodeSet<OWLClass> superClasses = reasoner.getSuperClasses(clazz, true);
             superClasses.entities().forEach(parent -> {
@@ -98,6 +100,25 @@ public class StatoTransformer implements Transformer {
             concept.addProperty().setCode("deprecated").setValue(new BooleanType(false));
         }
         return codeSystem;
+    }
+
+    private String labelFor(OWLClass clazz, OWLOntology ontology) {
+        OWLAnnotationObjectVisitorEx<String> visitor = new OWLAnnotationObjectVisitorEx<String>() {
+            String value;
+
+            @Override
+            public String visit(OWLAnnotation node) {
+                if (node.getProperty().isLabel()) {
+                    return ((OWLLiteral) node.getValue()).getLiteral();
+                }
+                return null;
+            }
+        };
+        return EntitySearcher.getAnnotations(clazz, ontology)
+                .map(anno -> anno.accept(visitor))
+                .filter(value -> value != null)
+                .findFirst()
+                .orElse(clazz.getIRI().toString());
     }
 
 
