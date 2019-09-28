@@ -3,6 +3,7 @@ package hot.fhirowl.loader.impl;
 import hot.fhirowl.loader.Transformer;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.CodeSystem;
+import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.StringType;
 import org.semanticweb.HermiT.ReasonerFactory;
 import org.semanticweb.owlapi.model.*;
@@ -24,21 +25,30 @@ public class StatoTransformer implements Transformer {
 
     private CodeSystem createCodeSystemR4(OWLOntology ontology) {
         CodeSystem cs = new CodeSystem();
-        cs.setName("http://purl.obolibrary.org/obo/stato.owl");
 
-        ontology.annotations().forEach(ann -> {
-            IRI propIRI = ann.getProperty().getIRI();
-            OWLLiteral value = (OWLLiteral) ann.getValue();
-            if (propIRI.equals(DublinCoreVocabulary.TITLE.getIRI())) {
+        // For notes on mapping, see
+        // https://github.com/hot-fhir/fhir-owl/wiki/STATO-OWL-to-FHIR-CodeSystem-mappings
+        cs.setName("STATO");
+        ontology.annotations().forEach(annotation -> {
+            IRI propIRI = annotation.getProperty().getIRI();
+            OWLLiteral value = (OWLLiteral) annotation.getValue();
+            if (propIRI.equals(DublinCoreVocabulary.TITLE.getIRI())) { //dc:title
                 cs.setTitle(value.getLiteral());
-            } else if (propIRI.equals(DublinCoreVocabulary.DESCRIPTION)) {
+            } else if (propIRI.equals(DublinCoreVocabulary.DESCRIPTION)) {  // dc:description
                 cs.setDescription(value.getLiteral());
-            } else if (propIRI.getIRIString().equals("http://purl.org/dc/terms/license")) {
+            } else if (propIRI.getIRIString().equals("http://purl.org/dc/terms/license")) { // terms:license
                 cs.setCopyright(value.getLiteral());
-            } else if (propIRI.equals(OWLRDFVocabulary.OWL_VERSION_INFO.getIRI())) {
+            } else if (propIRI.equals(OWLRDFVocabulary.OWL_VERSION_INFO.getIRI())) { // owl:versioninfo
                 cs.setVersion(value.getLiteral());
+            } else if (propIRI.equals(DublinCoreVocabulary.SUBJECT)) {  // dc:subject
+                cs.setPurpose(value.getLiteral());
             }
-            cs.setUrl("http://stato-ontology.org/");
+            cs.setStatus(Enumerations.PublicationStatus.ACTIVE)
+                    .setExperimental(true)
+                    .setHierarchyMeaning(CodeSystem.CodeSystemHierarchyMeaning.ISA)
+                    .setCompositional(true)
+                    .setVersionNeeded(false)
+                    .setContent(CodeSystem.CodeSystemContentMode.COMPLETE);
         });
 
         // Add filter and property
@@ -127,11 +137,9 @@ public class StatoTransformer implements Transformer {
                 .orElse(clazz.getIRI().toString());
     }
 
-
     @Override
     public org.hl7.fhir.dstu3.model.CodeSystem transformToDstu3(OWLOntology ontology) {
         return null;
     }
-
 
 }
