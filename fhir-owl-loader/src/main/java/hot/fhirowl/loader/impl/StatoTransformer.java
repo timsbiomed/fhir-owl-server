@@ -34,13 +34,13 @@ public class StatoTransformer implements Transformer {
             OWLLiteral value = (OWLLiteral) annotation.getValue();
             if (propIRI.equals(DublinCoreVocabulary.TITLE.getIRI())) { //dc:title
                 cs.setTitle(value.getLiteral());
-            } else if (propIRI.equals(DublinCoreVocabulary.DESCRIPTION)) {  // dc:description
+            } else if (propIRI.equals(DublinCoreVocabulary.DESCRIPTION.getIRI())) {  // dc:description
                 cs.setDescription(value.getLiteral());
             } else if (propIRI.getIRIString().equals("http://purl.org/dc/terms/license")) { // terms:license
                 cs.setCopyright(value.getLiteral());
             } else if (propIRI.equals(OWLRDFVocabulary.OWL_VERSION_INFO.getIRI())) { // owl:versioninfo
                 cs.setVersion(value.getLiteral());
-            } else if (propIRI.equals(DublinCoreVocabulary.SUBJECT)) {  // dc:subject
+            } else if (propIRI.equals(DublinCoreVocabulary.SUBJECT.getIRI())) {  // dc:subject
                 cs.setPurpose(value.getLiteral());
             }
             cs.setStatus(Enumerations.PublicationStatus.ACTIVE)
