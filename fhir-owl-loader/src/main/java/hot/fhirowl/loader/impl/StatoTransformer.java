@@ -15,8 +15,8 @@ import org.semanticweb.owlapi.vocab.DublinCoreVocabulary;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class StatoTransformer implements Transformer {
     @Override
@@ -93,9 +93,14 @@ public class StatoTransformer implements Transformer {
         ReasonerFactory factory = new ReasonerFactory();
         OWLReasoner reasoner = factory.createReasoner(ontology);
         Set<OWLClass> visited = new HashSet<>();
+        AtomicInteger counter = new AtomicInteger(0);
         ontology.classesInSignature()
                 .filter(clazz -> !clazz.getIRI().equals(IRI.create("http://www.w3.org/2002/07/owl#Thing")))
-                .forEach(clazz -> visitClass(reasoner, clazz, visited, ontology, codeSystem));
+                .forEach(clazz -> {
+                    visitClass(reasoner, clazz, visited, ontology, codeSystem);
+                    counter.getAndIncrement();
+                });
+        codeSystem.setCount(counter.intValue());
         return codeSystem;
     }
 
@@ -113,7 +118,7 @@ public class StatoTransformer implements Transformer {
             NodeSet<OWLClass> superClasses = reasoner.getSuperClasses(clazz, true);
             if (superClasses.isSingleton()) {
                 OWLClass parent = superClasses.entities().findFirst().get();
-                if (parent.getIRI().equals(OWL.THING)) {
+                if (parent.getIRI().equals(IRI.create("http://www.w3.org/2002/07/owl#Thing"))) {
                     concept.addProperty().setCode("root").setValue(new BooleanType(true));
                 } else {
                     concept.addProperty().setCode("root").setValue(new BooleanType(false));
@@ -123,7 +128,7 @@ public class StatoTransformer implements Transformer {
                 concept.addProperty().setCode("root").setValue(new BooleanType(true));
                 superClasses
                         .entities()
-                        .filter(parent -> !parent.getIRI().equals(OWL.THING))
+                        .filter(parent -> !parent.getIRI().equals(IRI.create("http://www.w3.org/2002/07/owl#Thing")))
                         .forEach(parent -> concept.addProperty().setCode("parent").setValue(new StringType(parent.getIRI().getRemainder().get())));
 
             }
