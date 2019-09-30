@@ -1,6 +1,7 @@
 package hot.fhirowl.loader.impl;
 
 import hot.fhirowl.loader.Transformer;
+import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.CodeSystem;
 import org.hl7.fhir.r4.model.Enumerations;
@@ -14,6 +15,7 @@ import org.semanticweb.owlapi.vocab.DublinCoreVocabulary;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class StatoTransformer implements Transformer {
@@ -68,6 +70,10 @@ public class StatoTransformer implements Transformer {
                 .setCode("deprecated")
                 .setDescription("Indicates if this concept is deprecated.")
                 .setType(CodeSystem.PropertyType.BOOLEAN);
+        cs.addProperty()
+                .setCode("r_command")
+                .setDescription("R Command")
+                .setType(CodeSystem.PropertyType.STRING);
         cs.addFilter()
                 .setCode("root")
                 .addOperator(CodeSystem.FilterOperator.EQUAL)
@@ -87,7 +93,9 @@ public class StatoTransformer implements Transformer {
         ReasonerFactory factory = new ReasonerFactory();
         OWLReasoner reasoner = factory.createReasoner(ontology);
         Set<OWLClass> visited = new HashSet<>();
-        ontology.classesInSignature().forEach(clazz -> visitClass(reasoner, clazz, visited, ontology, codeSystem));
+        ontology.classesInSignature()
+                .filter(clazz -> !clazz.getIRI().equals(IRI.create("http://www.w3.org/2002/07/owl#Thing")))
+                .forEach(clazz -> visitClass(reasoner, clazz, visited, ontology, codeSystem));
         return codeSystem;
     }
 
@@ -97,44 +105,35 @@ public class StatoTransformer implements Transformer {
             CodeSystem.ConceptDefinitionComponent concept = codeSystem.addConcept();
 
             String code = clazz.getIRI().getRemainder().get();
-
             concept.setCode(code);
-            concept.setDisplay(labelFor(clazz, ontology));
 
-            if (code.startsWith("STATO_")) {
-                concept.addProperty().setCode("imported").setValue(new BooleanType(false));
-            } else {
-                concept.addProperty().setCode("imported").setValue(new BooleanType(true));
-            }
+            StatoAnnotationVisitor visitor = new StatoAnnotationVisitor(concept);
+            EntitySearcher.getAnnotations(clazz, ontology).forEach(annotation -> annotation.accept(visitor));
 
             NodeSet<OWLClass> superClasses = reasoner.getSuperClasses(clazz, true);
-            superClasses.entities().forEach(parent -> {
-                concept.addProperty().setCode("parent").setValue(new StringType(parent.getIRI().getRemainder().get()));
-            });
-            // TODO: implement the next two lines for all cases
-            concept.addProperty().setCode("root").setValue(new BooleanType(false));
+            if (superClasses.isSingleton()) {
+                OWLClass parent = superClasses.entities().findFirst().get();
+                if (parent.getIRI().equals(OWL.THING)) {
+                    concept.addProperty().setCode("root").setValue(new BooleanType(true));
+                } else {
+                    concept.addProperty().setCode("root").setValue(new BooleanType(false));
+                    concept.addProperty().setCode("parent").setValue(new StringType(parent.getIRI().getRemainder().get()));
+                }
+            } else {
+                concept.addProperty().setCode("root").setValue(new BooleanType(true));
+                superClasses
+                        .entities()
+                        .filter(parent -> !parent.getIRI().equals(OWL.THING))
+                        .forEach(parent -> concept.addProperty().setCode("parent").setValue(new StringType(parent.getIRI().getRemainder().get())));
+
+            }
+            if (!concept.getProperty().stream().anyMatch(property -> property.getCode().equals("imported"))) {
+                concept.addProperty().setCode("imported").setValue(new BooleanType(false));
+            }
+            // TODO: implement the next line for all cases
             concept.addProperty().setCode("deprecated").setValue(new BooleanType(false));
         }
         return codeSystem;
-    }
-
-    private String labelFor(OWLClass clazz, OWLOntology ontology) {
-        OWLAnnotationObjectVisitorEx<String> visitor = new OWLAnnotationObjectVisitorEx<String>() {
-            String value;
-
-            @Override
-            public String visit(OWLAnnotation node) {
-                if (node.getProperty().isLabel()) {
-                    return ((OWLLiteral) node.getValue()).getLiteral();
-                }
-                return null;
-            }
-        };
-        return EntitySearcher.getAnnotations(clazz, ontology)
-                .map(anno -> anno.accept(visitor))
-                .filter(value -> value != null)
-                .findFirst()
-                .orElse(clazz.getIRI().toString());
     }
 
     @Override
@@ -142,4 +141,38 @@ public class StatoTransformer implements Transformer {
         return null;
     }
 
+    class StatoAnnotationVisitor implements OWLAnnotationObjectVisitor {
+        private CodeSystem.ConceptDefinitionComponent concept;
+
+        public StatoAnnotationVisitor(CodeSystem.ConceptDefinitionComponent concept) {
+            this.concept = concept;
+        }
+
+        @Override
+        public void visit(OWLAnnotation node) {
+            if (node.getProperty().isLabel()) {
+                concept.setDisplay(getAnnotationLiteral(node));
+            } else {
+                IRI propIRI = node.getProperty().getIRI();
+                if (propIRI.equals(IRI.create("http://purl.obolibrary.org/obo/IAO_0000115"))) {
+                    concept.setDefinition(getAnnotationLiteral(node));
+                } else if (propIRI.equals(IRI.create("http://purl.obolibrary.org/obo/IAO_0000118"))) {
+                    concept.setDisplay(getAnnotationLiteral(node));
+                } else if (propIRI.equals(IRI.create("http://purl.obolibrary.org/obo/STATO_0000041"))) {
+                    concept.addProperty().setCode("r_command").setValue(new StringType(getAnnotationLiteral(node)));
+                } else if (propIRI.equals(IRI.create("http://purl.obolibrary.org/obo/IAO_0000412"))) {
+                    concept.addProperty().setCode("imported").setValue(new BooleanType(true));
+                }
+            }
+        }
+    }
+
+    private String getAnnotationLiteral(OWLAnnotation annotation) {
+        OWLAnnotationValue value = annotation.getValue();
+        if (value.isLiteral()) {
+            return value.literalValue().get().getLiteral();
+        } else {
+            return null;
+        }
+    }
 }
