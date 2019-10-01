@@ -52,6 +52,10 @@
       <artifactId>fhir-owl-loader</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.obolibrary.robot</groupId>
+      <artifactId>robot-core</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
