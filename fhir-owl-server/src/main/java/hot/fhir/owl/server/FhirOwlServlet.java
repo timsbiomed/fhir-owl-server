@@ -23,7 +23,7 @@ public class FhirOwlServlet extends RestfulServer {
     @Override
     public void initialize() {
         List<IResourceProvider> providers = new ArrayList<>();
-        providers.add(new OwlCodeSystemResourceProvider());
+        providers.add(new InMemoryOWLCodeSystemResourceProvider());
         setResourceProviders(providers);
 
         INarrativeGenerator narrativeGen = new DefaultThymeleafNarrativeGenerator();

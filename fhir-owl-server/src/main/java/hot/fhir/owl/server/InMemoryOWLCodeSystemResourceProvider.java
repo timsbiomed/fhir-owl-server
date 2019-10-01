@@ -20,11 +20,11 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
-public class OwlCodeSystemResourceProvider implements IResourceProvider {
+public class InMemoryOWLCodeSystemResourceProvider implements IResourceProvider {
     private Map<String, CodeSystem> codeSystems = new HashMap<>();
-    private final Logger logger = LoggerFactory.getLogger(OwlCodeSystemResourceProvider.class);
+    private final Logger logger = LoggerFactory.getLogger(InMemoryOWLCodeSystemResourceProvider.class);
 
-    public OwlCodeSystemResourceProvider() {
+    public InMemoryOWLCodeSystemResourceProvider() {
         // TODO: Change this to load dynamically
         String id = "stato";
         String url = "http://purl.obolibrary.org/obo/stato.owl";
