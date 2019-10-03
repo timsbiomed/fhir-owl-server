@@ -1,23 +1,20 @@
 package hot.fhir.owl.server;
 
+import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.model.primitive.StringDt;
-import ca.uhn.fhir.rest.annotation.IdParam;
-import ca.uhn.fhir.rest.annotation.Read;
-import ca.uhn.fhir.rest.annotation.RequiredParam;
-import ca.uhn.fhir.rest.annotation.Search;
+import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import hot.fhirowl.loader.impl.StatoTransformer;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.CodeSystem;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.*;
 import org.obolibrary.robot.IOHelper;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
@@ -73,5 +70,18 @@ public class InMemoryOWLCodeSystemResourceProvider implements IResourceProvider 
         return list;
     }
 
-
+    @Operation(name = JpaConstants.OPERATION_LOOKUP, idempotent = true, returnParameters = {
+            @OperationParam(name="name", type=StringType.class, min=1),
+            @OperationParam(name="version", type=StringType.class, min=0),
+            @OperationParam(name="display", type=StringType.class, min=1),
+            @OperationParam(name="abstract", type=BooleanType.class, min=1)
+    })
+    public Parameters lookup(HttpServletRequest servletRequest,
+                             @OperationParam(name = "code", min = 0, max = 1) CodeType code,
+                             @OperationParam(name = "system", min = 0, max = 1) UriType system,
+                             @OperationParam(name = "codeing", min = 0, max = 1) Coding coding,
+                             @OperationParam(name = "property", min = 0, max = OperationParam.MAX_UNLIMITED) List<CodeType> properties) {
+        Parameters parameters = new Parameters();
+        return parameters;
+    }
 }
