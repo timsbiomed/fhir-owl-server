@@ -1,13 +1,17 @@
 package hot.fhir.owl.server;
 
+import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
+import ca.uhn.fhir.rest.annotation.RequiredParam;
+import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import hot.fhirowl.loader.impl.StatoTransformer;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.CodeSystem;
 import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.Patient;
 import org.obolibrary.robot.IOHelper;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -17,8 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class InMemoryOWLCodeSystemResourceProvider implements IResourceProvider {
     private Map<String, CodeSystem> codeSystems = new HashMap<>();
@@ -57,5 +60,16 @@ public class InMemoryOWLCodeSystemResourceProvider implements IResourceProvider 
             throw new ResourceNotFoundException(theId);
         }
         return cs;
+    }
+
+    @Search
+    public List<CodeSystem> findCodeSystemByCode(@RequiredParam(name = "title") StringDt title) {
+        LinkedList<CodeSystem> list = new LinkedList<>();
+        for (CodeSystem codeSystem: codeSystems.values()) {
+            if (codeSystem.getTitle().toLowerCase().contains(title.toString().toLowerCase())) {
+                list.add(codeSystem);
+            }
+        }
+        return list;
     }
 }
