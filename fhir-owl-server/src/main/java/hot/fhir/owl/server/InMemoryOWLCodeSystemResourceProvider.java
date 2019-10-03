@@ -63,7 +63,7 @@ public class InMemoryOWLCodeSystemResourceProvider implements IResourceProvider 
     }
 
     @Search
-    public List<CodeSystem> findCodeSystemByCode(@RequiredParam(name = "title") StringDt title) {
+    public List<CodeSystem> findCodeSystemByTitle(@RequiredParam(name = "title") StringDt title) {
         LinkedList<CodeSystem> list = new LinkedList<>();
         for (CodeSystem codeSystem: codeSystems.values()) {
             if (codeSystem.getTitle().toLowerCase().contains(title.toString().toLowerCase())) {
@@ -72,4 +72,6 @@ public class InMemoryOWLCodeSystemResourceProvider implements IResourceProvider 
         }
         return list;
     }
+
+
 }
