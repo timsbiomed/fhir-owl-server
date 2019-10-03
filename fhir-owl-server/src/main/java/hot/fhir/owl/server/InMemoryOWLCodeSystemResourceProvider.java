@@ -60,7 +60,7 @@ public class InMemoryOWLCodeSystemResourceProvider implements IResourceProvider 
     }
 
     @Search
-    public List<CodeSystem> findCodeSystemByTitle(@RequiredParam(name = "title") StringDt title) {
+    public List<CodeSystem> findCodeSystemsByTitle(@RequiredParam(name = "title") StringDt title) {
         LinkedList<CodeSystem> list = new LinkedList<>();
         for (CodeSystem codeSystem: codeSystems.values()) {
             if (codeSystem.getTitle().toLowerCase().contains(title.toString().toLowerCase())) {
@@ -68,6 +68,11 @@ public class InMemoryOWLCodeSystemResourceProvider implements IResourceProvider 
             }
         }
         return list;
+    }
+
+    @Search
+    public List<CodeSystem> findAllCodeSystems() {
+        return new ArrayList<>(codeSystems.values());
     }
 
     @Operation(name = JpaConstants.OPERATION_LOOKUP, idempotent = true, returnParameters = {
@@ -82,6 +87,7 @@ public class InMemoryOWLCodeSystemResourceProvider implements IResourceProvider 
                              @OperationParam(name = "codeing", min = 0, max = 1) Coding coding,
                              @OperationParam(name = "property", min = 0, max = OperationParam.MAX_UNLIMITED) List<CodeType> properties) {
         Parameters parameters = new Parameters();
+
         return parameters;
     }
 }
