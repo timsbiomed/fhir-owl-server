@@ -75,6 +75,11 @@
         <version>${hapifhir.version}</version>
       </dependency>
       <dependency>
+        <groupId>ca.uhn.hapi.fhir</groupId>
+        <artifactId>hapi-fhir-jpaserver-base</artifactId>
+        <version>${hapifhir.version}</version>
+      </dependency>
+      <dependency>
         <groupId>net.sourceforge.owlapi</groupId>
         <artifactId>owlapi-distribution</artifactId>
         <version>5.1.11</version>
