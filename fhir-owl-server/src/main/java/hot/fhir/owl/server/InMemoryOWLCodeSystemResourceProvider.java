@@ -1,10 +1,13 @@
 package hot.fhir.owl.server;
 
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.context.support.IContextValidationSupport;
 import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
+import ca.uhn.fhir.util.ParametersUtil;
 import hot.fhirowl.loader.impl.StatoTransformer;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
@@ -22,12 +25,17 @@ import java.util.*;
 
 public class InMemoryOWLCodeSystemResourceProvider implements IResourceProvider {
     private Map<String, CodeSystem> codeSystems = new HashMap<>();
+    private Map<String, String> uriMap = new HashMap<>();
     private final Logger logger = LoggerFactory.getLogger(InMemoryOWLCodeSystemResourceProvider.class);
+    private FhirContext fhirContext;
 
-    public InMemoryOWLCodeSystemResourceProvider() {
+    public InMemoryOWLCodeSystemResourceProvider(FhirContext fhirContext) {
+        this.fhirContext = fhirContext;
+
         // TODO: Change this to load dynamically
         String id = "stato";
         String url = "http://purl.obolibrary.org/obo/stato.owl";
+        uriMap.put(url, id);
         try {
             Instant start = Instant.now();
             OWLOntology ontology = new IOHelper().loadOntology(IRI.create(url));
@@ -87,6 +95,23 @@ public class InMemoryOWLCodeSystemResourceProvider implements IResourceProvider 
                              @OperationParam(name = "codeing", min = 0, max = 1) Coding coding,
                              @OperationParam(name = "property", min = 0, max = OperationParam.MAX_UNLIMITED) List<CodeType> properties) {
         Parameters parameters = new Parameters();
+        IContextValidationSupport.LookupCodeResult result = new IContextValidationSupport.LookupCodeResult();
+        if (uriMap.containsKey(system.getValue())) {
+            CodeSystem cs = codeSystems.get(uriMap.get(system.getValue()));
+            for (CodeSystem.ConceptDefinitionComponent concept: cs.getConcept()) {
+                if (concept.getCode().equals(code.getCode())) {
+                    parameters.addParameter().setName("display").setValue(concept.getDisplayElement());
+                    parameters.addParameter().setName("name").setValue(cs.getNameElement());
+                    concept.getProperty().forEach(property -> {
+                        Parameters.ParametersParameterComponent codeParam = new Parameters.ParametersParameterComponent();
+                        codeParam.setName("code").setValue(property.getCodeElement());
+                        Parameters.ParametersParameterComponent valueParam = new Parameters.ParametersParameterComponent();
+                        valueParam.setName("value").setValue(property.getValue());
+                        parameters.addParameter().setName("property").addPart(codeParam).addPart(valueParam);
+                    });
+                }
+            }
+        }
 
         return parameters;
     }
