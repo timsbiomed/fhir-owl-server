@@ -18,8 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
-import java.nio.file.Paths;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -31,48 +30,27 @@ public class InMemoryOWLCodeSystemResourceProvider implements IResourceProvider 
     private FhirContext fhirContext;
 
     public InMemoryOWLCodeSystemResourceProvider(FhirContext fhirContext) {
-        // Serialize the object
         this.fhirContext = fhirContext;
 
         // TODO: Change this to load dynamically
         String id = "stato";
         String url = "http://purl.obolibrary.org/obo/stato.owl";
         uriMap.put(url, id);
-        String tmpDirStr = System.getProperty("java.io.tmpdir");
-        File tmpDir = new File(tmpDirStr);
-        if (!tmpDir.exists()) tmpDir.mkdirs();
-        String filepath = Paths.get(tmpDirStr, "stato.json").toString();
-
-        CodeSystem codeSystem = null;
-        if (new File(filepath).exists()) {
-            try {
-                codeSystem = (CodeSystem) fhirContext.newJsonParser().parseResource(new FileReader(filepath));
-            } catch (FileNotFoundException fnfex) {
-                fnfex.printStackTrace();
-            }
+        try {
+            Instant start = Instant.now();
+            OWLOntology ontology = new IOHelper().loadOntology(IRI.create(url));
+            Instant step1 = Instant.now();
+            logger.info("Total execution time for loading ontology: {}", Duration.between(start, step1).toMillis());
+            StatoTransformer transformer = new StatoTransformer();
+            CodeSystem codeSystem = transformer.transformToR4(ontology);
+            codeSystem.setId(id);
+            codeSystem.setUrl(url);
+            codeSystems.put(id, codeSystem);
+            Instant finish = Instant.now();
+            logger.info("Total execution time for transforming ontology: {}", Duration.between(step1, finish).toMillis());
+        } catch (IOException usex) {
+            System.err.println("Failed to load ontology");
         }
-        if (codeSystem == null) {
-            try {
-                Instant start = Instant.now();
-                OWLOntology ontology = new IOHelper().loadOntology(IRI.create(url));
-                Instant step1 = Instant.now();
-                logger.info("Total execution time for loading ontology: {}", Duration.between(start, step1).toMillis());
-                StatoTransformer transformer = new StatoTransformer();
-                codeSystem = transformer.transformToR4(ontology);
-                codeSystem.setId(id);
-                codeSystem.setUrl(url);
-
-                FileWriter writer = new FileWriter(filepath);
-                fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToWriter(codeSystem, writer);
-                logger.info("File written to: " + filepath);
-
-                Instant finish = Instant.now();
-                logger.info("Total execution time for transforming ontology: {}", Duration.between(step1, finish).toMillis());
-            } catch (IOException usex) {
-                System.err.println("Failed to load ontology");
-            }
-        }
-        codeSystems.put(id, codeSystem);
     }
 
     @Override
