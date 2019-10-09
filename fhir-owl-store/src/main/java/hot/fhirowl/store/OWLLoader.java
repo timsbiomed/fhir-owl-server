@@ -1,7 +1,7 @@
-package hot.fhirowl.loader;
+package hot.fhirowl.store;
 
 import ca.uhn.fhir.context.FhirContext;
-import hot.fhirowl.loader.impl.StatoTransformer;
+import hot.fhirowl.store.impl.StatoTransformer;
 import org.hl7.fhir.r4.model.CodeSystem;
 import org.semanticweb.HermiT.ReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;

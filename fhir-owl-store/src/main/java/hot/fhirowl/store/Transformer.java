@@ -1,4 +1,4 @@
-package hot.fhirowl.loader;
+package hot.fhirowl.store;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 

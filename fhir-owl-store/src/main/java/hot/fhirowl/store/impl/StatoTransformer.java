@@ -1,7 +1,6 @@
-package hot.fhirowl.loader.impl;
+package hot.fhirowl.store.impl;
 
-import hot.fhirowl.loader.Transformer;
-import org.eclipse.rdf4j.model.vocabulary.OWL;
+import hot.fhirowl.store.Transformer;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.CodeSystem;
 import org.hl7.fhir.r4.model.Enumerations;

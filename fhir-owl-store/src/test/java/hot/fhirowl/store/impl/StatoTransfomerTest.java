@@ -1,7 +1,5 @@
-package hot.fhirowl.loader.impl;
+package hot.fhirowl.store.impl;
 
-import ca.uhn.fhir.context.FhirContext;
-import org.hl7.fhir.r4.model.CodeSystem;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;

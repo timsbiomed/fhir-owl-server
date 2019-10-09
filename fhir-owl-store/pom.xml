@@ -11,9 +11,9 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>fhir-owl-loader</artifactId>
+  <artifactId>fhir-owl-store</artifactId>
 
-  <name>FHIR OWL Loader</name>
+  <name>FHIR OWL Store</name>
   <url>https://github.com/hot-fhir/fhir-owl</url>
 
   <dependencies>
