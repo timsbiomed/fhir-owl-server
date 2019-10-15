@@ -52,13 +52,17 @@
       <artifactId>caffeine</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.ontotext.graphdb</groupId>
+      <artifactId>graphdb-free-runtime</artifactId>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>fhir-owl-loader</artifactId>
+      <artifactId>fhir-owl-owlapi</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.obolibrary.robot</groupId>
-      <artifactId>robot-core</artifactId>
+      <groupId>commons-validator</groupId>
+      <artifactId>commons-validator</artifactId>
     </dependency>
   </dependencies>
   <build>

@@ -5,40 +5,39 @@ import ca.uhn.fhir.context.support.IContextValidationSupport;
 import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.annotation.*;
-import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import ca.uhn.fhir.util.ParametersUtil;
-import hot.fhirowl.loader.impl.StatoTransformer;
+import hot.fhirowl.owlapi.OWLLoader;
+import hot.fhirowl.owlapi.impl.StatoTransformer;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
-import org.obolibrary.robot.IOHelper;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
-public class InMemoryOWLCodeSystemResourceProvider implements IResourceProvider {
+public class InMemoryOWLCodeSystemResourceProvider extends BaseOWLCodeSystemResourceProvider {
     private Map<String, CodeSystem> codeSystems = new HashMap<>();
-    private Map<String, String> uriMap = new HashMap<>();
     private final Logger logger = LoggerFactory.getLogger(InMemoryOWLCodeSystemResourceProvider.class);
     private FhirContext fhirContext;
 
     public InMemoryOWLCodeSystemResourceProvider(FhirContext fhirContext) {
-        this.fhirContext = fhirContext;
+        super(fhirContext);
 
         // TODO: Change this to load dynamically
         String id = "stato";
         String url = "http://purl.obolibrary.org/obo/stato.owl";
-        uriMap.put(url, id);
         try {
             Instant start = Instant.now();
-            OWLOntology ontology = new IOHelper().loadOntology(IRI.create(url));
+            OWLOntology ontology = new OWLLoader().getOntology(new URI(url));
             Instant step1 = Instant.now();
             logger.info("Total execution time for loading ontology: {}", Duration.between(start, step1).toMillis());
             StatoTransformer transformer = new StatoTransformer();
@@ -48,7 +47,7 @@ public class InMemoryOWLCodeSystemResourceProvider implements IResourceProvider 
             codeSystems.put(id, codeSystem);
             Instant finish = Instant.now();
             logger.info("Total execution time for transforming ontology: {}", Duration.between(step1, finish).toMillis());
-        } catch (IOException usex) {
+        } catch (OWLOntologyCreationException | URISyntaxException ex) {
             System.err.println("Failed to load ontology");
         }
     }

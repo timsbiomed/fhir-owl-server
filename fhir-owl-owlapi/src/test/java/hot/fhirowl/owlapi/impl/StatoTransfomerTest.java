@@ -1,4 +1,4 @@
-package hot.fhirowl.store.impl;
+package hot.fhirowl.owlapi.impl;
 
 import org.junit.Rule;
 import org.junit.Test;

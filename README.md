@@ -25,5 +25,5 @@ docker push jiaola/fhir-owl-server:latest
 To run the docker image with port forwarding: 
 
 ```
-docker run -p 8080:8080 jiaola/fhir-owl-server 
+docker run -d --name fhir-owl -p 8094:8080 --restart unless-stopped jiaola/fhir-owl-server 
 ```

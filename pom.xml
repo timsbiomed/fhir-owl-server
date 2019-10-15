@@ -20,9 +20,29 @@
   </properties>
 
   <modules>
-    <module>fhir-owl-loader</module>
+    <module>fhir-owl-owlapi</module>
     <module>fhir-owl-server</module>
   </modules>
+
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Maven Central</name>
+      <layout>default</layout>
+      <url>https://repo1.maven.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>jcenter</id>
+      <name>bintray</name>
+      <url>http://jcenter.bintray.com</url>
+    </repository>
+  </repositories>
 
   <dependencies>
     <dependency>
@@ -85,11 +105,6 @@
         <version>5.1.11</version>
       </dependency>
       <dependency>
-        <groupId>org.obolibrary.robot</groupId>
-        <artifactId>robot-core</artifactId>
-        <version>1.4.3</version>
-      </dependency>
-      <dependency>
         <groupId>net.sourceforge.owlapi</groupId>
         <artifactId>org.semanticweb.hermit</artifactId>
         <version>1.4.3.517</version>
@@ -130,6 +145,16 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
         <version>1.7.28</version>
+      </dependency>
+      <dependency>
+        <groupId>com.ontotext.graphdb</groupId>
+        <artifactId>graphdb-free-runtime</artifactId>
+        <version>9.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-validator</groupId>
+        <artifactId>commons-validator</artifactId>
+        <version>1.6</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>

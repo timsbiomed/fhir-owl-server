@@ -1,6 +1,6 @@
-package hot.fhirowl.store.impl;
+package hot.fhirowl.owlapi.impl;
 
-import hot.fhirowl.store.Transformer;
+import hot.fhirowl.owlapi.Transformer;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.CodeSystem;
 import org.hl7.fhir.r4.model.Enumerations;
