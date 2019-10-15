@@ -103,7 +103,7 @@ public class GraphDBCodeSystemResourceProvider extends BaseOWLCodeSystemResource
     public Parameters lookup(HttpServletRequest servletRequest,
                              @OperationParam(name = "code", min = 0, max = 1) CodeType code,
                              @OperationParam(name = "system", min = 0, max = 1) UriType system,
-                             @OperationParam(name = "codeing", min = 0, max = 1) Coding coding,
+                             @OperationParam(name = "coding", min = 0, max = 1) Coding coding,
                              @OperationParam(name = "property", min = 0, max = OperationParam.MAX_UNLIMITED) List<CodeType> properties) {
         Parameters parameters = new Parameters();
         parameters.addParameter().setName("name").setValue(new CodeType("STATO"));
