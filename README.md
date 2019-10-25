@@ -15,6 +15,8 @@ the fhir-owl-server module.
 mvn jetty:run -pl fhir-owl-server 
 ```
 
+## Docker
+
 To build and publish docker images,
 
 ```
@@ -27,3 +29,10 @@ To run the docker image with port forwarding:
 ```
 docker run -d --name fhir-owl -p 8094:8080 --restart unless-stopped jiaola/fhir-owl-server 
 ```
+
+To run the FHIR server with graphdb, use the following
+
+```
+docker-compose -f docker/docker-compose-graphdb.yml up -d 
+```
+

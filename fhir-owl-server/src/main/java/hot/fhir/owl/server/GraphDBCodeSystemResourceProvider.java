@@ -25,7 +25,8 @@ public class GraphDBCodeSystemResourceProvider extends BaseOWLCodeSystemResource
 
     public GraphDBCodeSystemResourceProvider(FhirContext fhirContext) {
         super(fhirContext);
-        this.repository = new HTTPRepository("http://localhost:7200/repositories/stato3");
+        String repoUrl = System.getenv("GRAPHDB_REPO_URL");
+        this.repository = new HTTPRepository(repoUrl);
     }
 
     @Override

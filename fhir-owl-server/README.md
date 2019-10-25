@@ -19,3 +19,11 @@ To run integration test (Start the service and test the API),
 ```
 mvn verify -Pintegration 
 ```
+
+## Build docker images
+
+To build the docker image for fhir-owl-server
+
+``` 
+docker build -t jiaola/fhir-owl-server -f docker/fhir-owl-server/Dockerfile .
+```

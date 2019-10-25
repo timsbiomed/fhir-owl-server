@@ -6,7 +6,7 @@ ENV APP_PORT 8080
 
 COPY ./fhir-owl-server/target/$WAR_FILE $APP_HOME/fhir-owl-server.war
 COPY ./fhir-owl-server/target/dependency/webapp-runner.jar $APP_HOME
-COPY docker/docker-entrypoint.sh $APP_HOME
+COPY ./docker/fhir-owl-server/docker-entrypoint.sh $APP_HOME
 
 # Create user/group
 RUN groupadd fhir && \

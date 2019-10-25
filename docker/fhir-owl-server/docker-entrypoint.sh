@@ -13,7 +13,7 @@
 set -e
 
 if [ -n "$JAVA_OPTS" ]; then
-  exec java "$JAVA_OPTS" -jar ${APP_HOME}/webapp-runner.jar --port $APP_PORT ${APP_HOME}/fhir-owl-server.war
+  exec java "$JAVA_OPTS" -jar "${APP_HOME}"/webapp-runner.jar --port "$APP_PORT" "${APP_HOME}"/fhir-owl-server.war
 else
-   exec java -jar ${APP_HOME}/webapp-runner.jar --port $APP_PORT ${APP_HOME}/fhir-owl-server.war
+   exec java -jar "${APP_HOME}"/webapp-runner.jar --port "$APP_PORT" "${APP_HOME}"/fhir-owl-server.war
 fi
