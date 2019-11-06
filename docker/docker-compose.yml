@@ -11,16 +11,16 @@ services:
       - "8090:8080"
     depends_on:
       - fhir-owl-graphdb
+      - fhir-owl-neo4j
     links:
       - fhir-owl-graphdb
     env_file:
       - fhir-owl-server/.env
+
   fhir-owl-graphdb:
     image: ontotext/graphdb:8.11.0-free
     container_name: fhir-owl-graphdb
     restart: always
-    env_file:
-      - graphdb/.env
     volumes:
       - fhir-owl-graphdb:/opt/graphdb/home/data
     ports:
@@ -37,11 +37,7 @@ services:
     ports:
       - "7474:7474"
       - "7687:7687"
-    entrypoint:
-      - /sbin/tini
-      - -g
-      - --
-      - /opt/docker-entrypoint.sh
+    entrypoint: /opt/docker-entrypoint.sh
 
 volumes:
   fhir-owl-graphdb:
