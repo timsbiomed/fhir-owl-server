@@ -407,7 +407,7 @@ if [ "${cmd}" == "dump-config" ]; then
     exit 0
 fi
 
-
-/var/lib/neo4j/bin/neo4j-admin load --database=graph.db --from=/opt/neo4j-cdmh-mapping.dump --force
+curl -L --output /opt/neo4j-cdmh.dump https://jh.box.com/shared/static/vs785t9qhek1x920jxqhbldrmrf1vtk6.dump
+/var/lib/neo4j/bin/neo4j-admin load --database=graph.db --from=/opt/neo4j-cdmh.dump --force
 exec /var/lib/neo4j/bin/neo4j console
 
