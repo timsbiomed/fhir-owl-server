@@ -2,7 +2,7 @@
 
 ## Getting Started
 
-To build and install, run 
+To build and standup the docker containers,  run
 
 ```
 mvn clean install 
