@@ -1,0 +1,50 @@
+version: "3"
+services:
+  fhir-owl-server:
+    build:
+      dockerfile: ./docker/fhir-owl-server/Dockerfile
+      context: ..
+    # image: jiaola/fhir-owl-server
+    container_name: fhir-owl-server
+    restart: on-failure
+    ports:
+      - "8090:8080"
+    depends_on:
+      - fhir-owl-graphdb
+    links:
+      - fhir-owl-graphdb
+    env_file:
+      - fhir-owl-server/.env
+  fhir-owl-graphdb:
+    image: ontotext/graphdb:8.11.0-free
+    container_name: fhir-owl-graphdb
+    restart: always
+    env_file:
+      - graphdb/.env
+    volumes:
+      - fhir-owl-graphdb:/opt/graphdb/home/data
+    ports:
+      - "7300:7200"
+  fhir-owl-neo4j:
+    image: neo4j:3.5
+    container_name: fhir-owl-neo4j
+    restart: always
+    environment:
+      - NEO4J_AUTH=none
+    volumes:
+      - ./neo4j/neo4j-cdmh-mapping.dump:/opt/neo4j-cdmh-mapping.dump
+      - ./neo4j/docker-entrypoint.sh:/opt/docker-entrypoint.sh
+      - fhir-owl-neo4j:/data
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    entrypoint:
+      - /sbin/tini
+      - -g
+      - --
+      - /opt/docker-entrypoint.sh
+
+volumes:
+  fhir-owl-graphdb:
+  fhir-owl-neo4j:
+

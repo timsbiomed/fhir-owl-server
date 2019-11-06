@@ -26,6 +26,7 @@ public class FhirOwlServlet extends RestfulServer {
         // providers.add(new InMemoryOWLCodeSystemResourceProvider(getFhirContext()));
         providers.add(new GraphDBCodeSystemResourceProvider(getFhirContext()));
         providers.add(new ConceptMapResourceProvider(getFhirContext()));
+        providers.add(new ValueSetResourceProvider(getFhirContext()));
         setResourceProviders(providers);
 
         INarrativeGenerator narrativeGen = new DefaultThymeleafNarrativeGenerator();
