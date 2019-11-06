@@ -15,7 +15,11 @@ public abstract class Neo4jResourceProvider implements IResourceProvider, AutoCl
         String url = System.getenv("NEO4J_URL");
         String username = System.getenv("NEO4J_USERNAME");
         String password = System.getenv("NEO4J_PASSWORD");
-        this.driver = GraphDatabase.driver(url, AuthTokens.basic(username, password));
+        if (username != null && password != null) {
+            this.driver = GraphDatabase.driver(url, AuthTokens.basic(username, password));
+        } else {
+            this.driver = GraphDatabase.driver(url);
+        }
     }
 
     @Override
