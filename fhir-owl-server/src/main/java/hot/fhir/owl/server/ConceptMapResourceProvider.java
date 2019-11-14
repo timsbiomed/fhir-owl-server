@@ -6,10 +6,12 @@ import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Operation;
 import ca.uhn.fhir.rest.annotation.OperationParam;
 import ca.uhn.fhir.rest.annotation.Read;
-import ca.uhn.fhir.rest.server.IResourceProvider;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
-import org.neo4j.driver.v1.*;
+import org.neo4j.driver.v1.Record;
+import org.neo4j.driver.v1.Session;
+import org.neo4j.driver.v1.Transaction;
+import org.neo4j.driver.v1.TransactionWork;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -85,9 +87,9 @@ public class ConceptMapResourceProvider extends Neo4jResourceProvider {
     }
 
     private static List<Record> searchMapping(Transaction tx, String source, String target) {
-        return tx.run("MATCH (v1:Vocabulary)<-[:PARTOF]-(a:Code)-[:MAP_TO]->(b:Code)-[:PARTOF]->(v2:Vocabulary) " +
+        return tx.run("MATCH (v1:Vocabulary)<-[:PART_OF]-(a:Code)-[:MAP_TO]->(b:Code)-[:PART_OF]->(v2:Vocabulary) " +
                 "WHERE v1.cdmh_id=$source AND v2.cdmh_id=$target " +
                 "RETURN a, b " +
-                "LIMIT 300", parameters("source", Integer.valueOf(source), "target", Integer.valueOf(target))).list();
+                "LIMIT 300", parameters("source", source, "target", target)).list();
     }
 }

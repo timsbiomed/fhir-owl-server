@@ -11,7 +11,6 @@ import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.Transaction;
 import org.neo4j.driver.v1.TransactionWork;
 
-import java.util.List;
 import java.util.Map;
 
 import static org.neo4j.driver.v1.Values.parameters;
@@ -30,29 +29,33 @@ public class ValueSetResourceProvider extends Neo4jResourceProvider {
     @Read
     public ValueSet read(@IdParam IdType idType) {
         ValueSet valueSet = new ValueSet();
-        List<Record> records = listCodesInVocabulary(idType.getIdPart());
+        Record record = listCodesInVocabulary(idType.getIdPart());
         ValueSet.ValueSetComposeComponent compose = new ValueSet.ValueSetComposeComponent();
         ValueSet.ConceptSetComponent conceptSet = new ValueSet.ConceptSetComponent();
-        records.forEach(record -> {
-            Map<String, Object> code = record.get(0).asMap();
-            conceptSet.addConcept().setCode((String)code.get("value")).setDisplay((String)code.get("short_name"));
+        Map<String, Object> vocMap = record.get("v").asMap();
+        valueSet.setName((String)vocMap.get("name"));
+        valueSet.setId((String)vocMap.get("cdmh_id"));
+        record.get("codes").asList(code -> {
+            Map<String, Object> codeMap = code.asMap();
+            conceptSet.addConcept().setCode((String)codeMap.get("value")).setDisplay((String)codeMap.get("short_name"));
+            return null;
         });
         compose.addInclude(conceptSet);
         valueSet.setCompose(compose);
         return valueSet;
     }
 
-    private List<Record> listCodesInVocabulary(String id) {
+    private Record listCodesInVocabulary(String id) {
         try (Session session = driver.session()) {
-            List<Record> records = session.readTransaction(new TransactionWork<List<Record>>() {
+            Record record = session.readTransaction(new TransactionWork<Record>() {
                 @Override
-                public List<Record> execute(Transaction transaction) {
-                    return transaction.run("MATCH (n:Code)-[:PARTOF]->(v:Vocabulary) " +
+                public Record execute(Transaction transaction) {
+                    return transaction.run("MATCH (n:Code)-[:PART_OF]->(v:Vocabulary) " +
                             "WHERE v.cdmh_id=$id " +
-                            "RETURN n", parameters("id", Integer.valueOf(id))).list();
+                            "RETURN v, COLLECT(n)[0..30] as codes", parameters("id", id)).single();
                 }
             });
-            return records;
+            return record;
         }
     }
 }
