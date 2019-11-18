@@ -25,19 +25,22 @@ services:
       - fhir-owl-graphdb:/opt/graphdb/home/data
     ports:
       - "7300:7200"
+
   fhir-owl-neo4j:
     image: neo4j:3.5
     container_name: fhir-owl-neo4j
     restart: always
     environment:
-      - NEO4J_AUTH=none
+      - NEO4J_AUTH=neo4j/n304j
     volumes:
-      - ./neo4j/docker-entrypoint.sh:/opt/docker-entrypoint.sh
+      - ./neo4j/import:/var/lib/neo4j/import
+      - ./neo4j/plugins:/var/lib/neo4j/plugins
+      - ./neo4j/logs:/var/lib/neo4j/logs
+      - ./neo4j/scripts:/opt/scripts
       - fhir-owl-neo4j:/data
     ports:
       - "7474:7474"
       - "7687:7687"
-    entrypoint: /opt/docker-entrypoint.sh
 
 volumes:
   fhir-owl-graphdb:

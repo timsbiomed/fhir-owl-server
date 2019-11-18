@@ -9,6 +9,13 @@ mvn clean install
 docker-compose -f docker/docker-compose.yml up
 ```
 
+Load data into graphdb
+
+```
+curl -X POST http://localhost:7300/rest/repositories -H 'Content-Type: multipart/form-data' -F "config=@docker/graphdb/fhirowl-config.ttl"
+curl -X POST http://localhost:7300/rest/data/import -H 'Content-Type: multipart/form-data' -F "config=@docker/graphdb/fhirowl-config.ttl" 
+ 
+```
 
 ## Developer's Guide: 
 
