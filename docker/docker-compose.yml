@@ -11,7 +11,7 @@ services:
       - "8090:8080"
     depends_on:
       - fhir-owl-graphdb
-#      - fhir-owl-neo4j
+      - fhir-owl-neo4j
     links:
       - fhir-owl-graphdb
     env_file:
