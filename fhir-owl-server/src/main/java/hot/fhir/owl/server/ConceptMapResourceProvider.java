@@ -12,6 +12,8 @@ import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.Transaction;
 import org.neo4j.driver.v1.TransactionWork;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.Map;
 import static org.neo4j.driver.v1.Values.parameters;
 
 public class ConceptMapResourceProvider extends Neo4jResourceProvider {
+    private Logger logger = LoggerFactory.getLogger(ConceptMapResourceProvider.class);
 
     public ConceptMapResourceProvider(FhirContext context) {
         super(context);
@@ -30,26 +33,11 @@ public class ConceptMapResourceProvider extends Neo4jResourceProvider {
         return ConceptMap.class;
     }
 
-    @Read
-    public ConceptMap read(@IdParam IdType theId) {
-        ConceptMap conceptMap = new ConceptMap();
-        return conceptMap;
-    }
-
-    @Operation(name = JpaConstants.OPERATION_LOOKUP, idempotent = true, returnParameters = {
-            @OperationParam(name="name", type= StringType.class, min=1),
-            @OperationParam(name="version", type=StringType.class, min=0),
-            @OperationParam(name="display", type=StringType.class, min=1),
-            @OperationParam(name="abstract", type= BooleanType.class, min=1)
-    })
-    public ConceptMap lookup(HttpServletRequest servletRequest,
-                             @OperationParam(name = "source", min = 0, max = 1) CodeType code ,
-                             @OperationParam(name = "system", min = 0, max = 1) UriType system,
-                             @OperationParam(name = "coding", min = 0, max = 1) Coding coding,
-                             @OperationParam(name = "property", min = 0, max = OperationParam.MAX_UNLIMITED) List<CodeType> properties) {
-        ConceptMap conceptMap = new ConceptMap();
-        return conceptMap;
-    }
+//    @Read
+//    public ConceptMap read(@IdParam IdType theId) {
+//        ConceptMap conceptMap = new ConceptMap();
+//        return conceptMap;
+//    }
 
     @Operation(name = JpaConstants.OPERATION_LOOKUP, idempotent = true, returnParameters = {
             @OperationParam(name="name", type= StringType.class, min=1),
@@ -64,6 +52,7 @@ public class ConceptMapResourceProvider extends Neo4jResourceProvider {
         conceptMap.setSource(sourceUri).setTarget(targetUri);
         ConceptMap.ConceptMapGroupComponent group = conceptMap.addGroup();
         List<Record> mappings = listMapping(sourceUri.getValueAsString(), targetUri.getValueAsString());
+        logger.debug("ConceptMap: " + conceptMap.toString());
         mappings.forEach(record -> {
             Map<String, Object> sourceCode = record.get("a").asMap();
             Map<String, Object> targetCode = record.get("b").asMap();

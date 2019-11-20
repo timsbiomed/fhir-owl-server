@@ -1,0 +1,30 @@
+FROM centos:7
+
+MAINTAINER Dazhi Jiao <djiao@jhu.edu>
+
+# Install Java
+ENV JAVA_HOME /usr/lib/jvm/java-openjdk
+ENV APP_HOME /opt
+
+COPY ./scripts/docker-entrypoint.sh $APP_HOME
+
+RUN rpm --import https://debian.neo4j.org/neotechnology.gpg.key && \
+echo $'[neo4j] \n\
+name=Neo4j RPM Repository \n\
+baseurl=https://yum.neo4j.org/stable \n\
+enabled=1 \n\
+gpgcheck=1 \n' \
+>> /etc/yum.repos.d/neo4j.repo && \
+    yum update -y && \
+    yum install -y java-1.8.0-openjdk-devel wget unzip curl vim sudo neo4j-3.5.12 && \
+    yum clean all && \
+    chown -R neo4j.neo4j $APP_HOME && \
+    chown -R neo4j.neo4j ${APP_HOME}/docker-entrypoint.sh && \
+    chmod +x ${APP_HOME}/docker-entrypoint.sh
+
+USER root
+WORKDIR $APP_HOME
+EXPOSE 7474
+EXPOSE 7374
+EXPOSE 7687
+ENTRYPOINT ["./docker-entrypoint.sh"]

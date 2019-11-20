@@ -11,11 +11,12 @@ services:
       - "8090:8080"
     depends_on:
       - fhir-owl-graphdb
-      - fhir-owl-neo4j
+#      - fhir-owl-neo4j
     links:
       - fhir-owl-graphdb
     env_file:
       - fhir-owl-server/.env
+      - fhir-owl-server/.secret.env
 
   fhir-owl-graphdb:
     image: ontotext/graphdb:8.11.0-free
@@ -25,24 +26,25 @@ services:
       - fhir-owl-graphdb:/opt/graphdb/home/data
     ports:
       - "7300:7200"
-
-  fhir-owl-neo4j:
-    image: neo4j:3.5
-    container_name: fhir-owl-neo4j
-    restart: always
-    environment:
-      - NEO4J_AUTH=neo4j/n304j
-    volumes:
-      - ./neo4j/import:/var/lib/neo4j/import
-      - ./neo4j/plugins:/var/lib/neo4j/plugins
-      - ./neo4j/logs:/var/lib/neo4j/logs
-      - ./neo4j/scripts:/opt/scripts
-      - fhir-owl-neo4j:/data
-    ports:
-      - "7474:7474"
-      - "7687:7687"
+#
+#  fhir-owl-neo4j:
+#    image: neo4j:3.5.12
+#    container_name: fhir-owl-neo4j
+#    restart: always
+#    environment:
+#      - NEO4J_AUTH=neo4j/n304j
+#    volumes:
+#      - ./neo4j/import:/var/lib/neo4j/import
+#      - ./neo4j/plugins:/var/lib/neo4j/plugins
+#      - ./neo4j/logs:/var/lib/neo4j/logs
+#      - ./neo4j/conf:/var/lib/neo4j/conf
+#      - ./neo4j/scripts:/opt/scripts
+#      - fhir-owl-neo4j:/data
+#    ports:
+#      - "7474:7474"
+#      - "7687:7687"
 
 volumes:
   fhir-owl-graphdb:
-  fhir-owl-neo4j:
+#  fhir-owl-neo4j:
 
