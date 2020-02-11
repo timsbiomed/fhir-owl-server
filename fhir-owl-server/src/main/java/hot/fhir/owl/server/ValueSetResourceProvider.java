@@ -33,8 +33,8 @@ public class ValueSetResourceProvider extends Neo4jResourceProvider {
         ValueSet.ValueSetComposeComponent compose = new ValueSet.ValueSetComposeComponent();
         ValueSet.ConceptSetComponent conceptSet = new ValueSet.ConceptSetComponent();
         Map<String, Object> vocMap = record.get("v").asMap();
-        valueSet.setName((String)vocMap.get("name"));
-        valueSet.setId((String)vocMap.get("cdmh_id"));
+        //valueSet.setName((String)vocMap.get("name"));
+        valueSet.setId((String)vocMap.get("name"));
         record.get("codes").asList(code -> {
             Map<String, Object> codeMap = code.asMap();
             conceptSet.addConcept().setCode((String)codeMap.get("value")).setDisplay((String)codeMap.get("short_name"));
@@ -51,7 +51,7 @@ public class ValueSetResourceProvider extends Neo4jResourceProvider {
                 @Override
                 public Record execute(Transaction transaction) {
                     return transaction.run("MATCH (n:Code)-[:PART_OF]->(v:Vocabulary) " +
-                            "WHERE v.cdmh_id=$id " +
+                            "WHERE LOWER(v.name)=LOWER($id) " +
                             "RETURN v, COLLECT(n)[0..30] as codes", parameters("id", id)).single();
                 }
             });

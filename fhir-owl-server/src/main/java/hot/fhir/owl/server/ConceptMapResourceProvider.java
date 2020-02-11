@@ -77,7 +77,7 @@ public class ConceptMapResourceProvider extends Neo4jResourceProvider {
 
     private static List<Record> searchMapping(Transaction tx, String source, String target) {
         return tx.run("MATCH (v1:Vocabulary)<-[:PART_OF]-(a:Code)-[:MAP_TO]->(b:Code)-[:PART_OF]->(v2:Vocabulary) " +
-                "WHERE v1.cdmh_id=$source AND v2.cdmh_id=$target " +
+                "WHERE LOWER(v1.name)=LOWER($source) AND LOWER(v2.name)=LOWER($target) " +
                 "RETURN a, b " +
                 "LIMIT 300", parameters("source", source, "target", target)).list();
     }
