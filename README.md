@@ -1,4 +1,7 @@
-# fhir owl
+# FHIR OWL Server
+
+Not the same as [aehrc/fhir-owl](https://github.com/aehrc/fhir-owl). A proof of concept REST service for CDMH / CCDH.
+
 
 ## Getting Started
 
